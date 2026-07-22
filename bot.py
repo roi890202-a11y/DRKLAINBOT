@@ -114,7 +114,7 @@ async def product_selected(
 
 
     message = (
-        f"שלום, אני מעוניין במוצר: "
+        f"אח יקר, אני מעוניין במוצר: "
         f"{product['name']}"
     )
 
