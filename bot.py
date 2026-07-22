@@ -42,7 +42,7 @@ PRODUCTS = [
         "price": 550
     },
     {
-        "name": "לבובו(מינימום הזמנה 5)",
+        "name": "לבובו מינימום הזמנה 5 (מינימום הזמנה 5)",
         "price": 350,
         "note": "מינימום הזמנה 5"
     }
@@ -53,7 +53,7 @@ def product_buttons():
     buttons = []
 
     for index, product in enumerate(PRODUCTS):
-        text = f"🧴 {product['name']} - ₪{product['price']}"
+        text = f"💎 {product['name']} - ₪{product['price']}"
 
         buttons.append([
             InlineKeyboardButton(
