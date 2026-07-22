@@ -134,7 +134,15 @@ async def back(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def main():
 
-    app = Application.builder().token(TOKEN).build()
+    app = (
+        Application.builder()
+        .token(TOKEN)
+        .connect_timeout(30)
+        .read_timeout(30)
+        .write_timeout(30)
+        .pool_timeout(30)
+        .build()
+    )
 
     app.add_handler(CommandHandler("start", start))
 
@@ -166,10 +174,20 @@ def home():
 
 
 def run_web():
+
     port = int(os.environ.get("PORT", 10000))
-    web_app.run(host="0.0.0.0", port=port)
+
+    web_app.run(
+        host="0.0.0.0",
+        port=port
+    )
 
 
 if __name__ == "__main__":
-    Thread(target=run_web).start()
+
+    Thread(
+        target=run_web,
+        daemon=True
+    ).start()
+
     main()
