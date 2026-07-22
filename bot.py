@@ -8,6 +8,10 @@ from telegram.ext import (
 
 from config import TOKEN, CONTACT_USERNAME
 
+from flask import Flask
+from threading import Thread
+import os
+
 
 WELCOME_TEXT = """
 🔥 ברוכים הבאים!
@@ -153,5 +157,19 @@ def main():
     app.run_polling()
 
 
+web_app = Flask(__name__)
+
+
+@web_app.route("/")
+def home():
+    return "Bot is running"
+
+
+def run_web():
+    port = int(os.environ.get("PORT", 10000))
+    web_app.run(host="0.0.0.0", port=port)
+
+
 if __name__ == "__main__":
+    Thread(target=run_web).start()
     main()
