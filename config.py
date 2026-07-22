@@ -1,2 +1,4 @@
-TOKEN = "8686390269:AAFJybFbDlPWMVV_7bINjuwInWZu5JQc0l4"
-CONTACT_USERNAME = "dr_klein"
+import os
+
+TOKEN = os.getenv("TOKEN")
+CONTACT_USERNAME = os.getenv("CONTACT_USERNAME")
