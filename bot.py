@@ -10,6 +10,7 @@ from config import TOKEN, CONTACT_USERNAME
 
 from flask import Flask
 from threading import Thread
+from urllib.parse import quote
 import os
 
 
@@ -50,9 +51,11 @@ PRODUCTS = [
 
 
 def product_buttons():
+
     buttons = []
 
     for index, product in enumerate(PRODUCTS):
+
         text = f"💎 {product['name']} - ₪{product['price']}"
 
         buttons.append([
@@ -65,7 +68,10 @@ def product_buttons():
     return InlineKeyboardMarkup(buttons)
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
 
     with open("doctork.png", "rb") as photo:
 
@@ -76,9 +82,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 
-async def product_selected(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def product_selected(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
 
     query = update.callback_query
+
     await query.answer()
 
     index = int(query.data.split("_")[1])
@@ -88,79 +98,149 @@ async def product_selected(update: Update, context: ContextTypes.DEFAULT_TYPE):
     extra = ""
 
     if "note" in product:
+
         extra = f"\n📌 {product['note']}"
+
 
     text = (
         f"✅ בחרת: {product['name']}\n"
         f"💰 מחיר: ₪{product['price']}"
         f"{extra}\n\n"
-        "😍חיים שלייי אתה הולך להנות !\n\n"
+        "😍 חיים שלייי אתה הולך ליהנות!\n\n"
         "כדי להשלים את ההזמנה ולאמת את הפרטים,\n"
         "לחץ על הכפתור למטה ותועבר ישירות לשיחה פרטית איתי.\n\n"
         "🚚 לאחר האימות נוכל להמשיך בטיפול בהזמנה."
     )
 
+
+    message = (
+        f"שלום, אני מעוניין במוצר: "
+        f"{product['name']}"
+    )
+
+    encoded_message = quote(message)
+
+
     buttons = [
+
         [
+
             InlineKeyboardButton(
                 "💬 מעבר לשיחה פרטית",
-                url=f"https://t.me/{CONTACT_USERNAME}"
+                url=(
+                    f"https://t.me/"
+                    f"{CONTACT_USERNAME}"
+                    f"?text={encoded_message}"
+                )
             )
+
         ],
+
         [
+
             InlineKeyboardButton(
                 "🔙 חזרה למוצרים",
                 callback_data="back"
             )
+
         ]
+
     ]
 
+
     await query.message.reply_text(
+
         text,
+
         reply_markup=InlineKeyboardMarkup(buttons)
+
     )
 
 
-async def back(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def back(
+
+    update: Update,
+
+    context: ContextTypes.DEFAULT_TYPE
+
+):
 
     query = update.callback_query
+
     await query.answer()
 
+
     await query.message.reply_text(
+
         WELCOME_TEXT,
+
         reply_markup=product_buttons()
+
     )
 
 
 def main():
 
     app = (
+
         Application.builder()
+
         .token(TOKEN)
+
         .connect_timeout(30)
+
         .read_timeout(30)
+
         .write_timeout(30)
+
         .pool_timeout(30)
+
         .build()
+
     )
 
-    app.add_handler(CommandHandler("start", start))
 
     app.add_handler(
+
+        CommandHandler(
+
+            "start",
+
+            start
+
+        )
+
+    )
+
+
+    app.add_handler(
+
         CallbackQueryHandler(
+
             product_selected,
+
             pattern="^product_"
+
         )
+
     )
 
+
     app.add_handler(
+
         CallbackQueryHandler(
+
             back,
+
             pattern="^back$"
+
         )
+
     )
+
 
     print("הבוט התחיל לעבוד!")
+
 
     app.run_polling()
 
@@ -169,25 +249,45 @@ web_app = Flask(__name__)
 
 
 @web_app.route("/")
+
 def home():
+
     return "Bot is running"
 
 
 def run_web():
 
-    port = int(os.environ.get("PORT", 10000))
+    port = int(
+
+        os.environ.get(
+
+            "PORT",
+
+            10000
+
+        )
+
+    )
+
 
     web_app.run(
+
         host="0.0.0.0",
+
         port=port
+
     )
 
 
 if __name__ == "__main__":
 
     Thread(
+
         target=run_web,
+
         daemon=True
+
     ).start()
+
 
     main()
